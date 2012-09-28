@@ -1,4 +1,4 @@
-package maryfisher.austengames.util {
+package maryfisher.util.pathfinding {
 	import adobe.utils.CustomActions;
 	/**
 	 * ...

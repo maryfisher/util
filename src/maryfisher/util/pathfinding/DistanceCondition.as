@@ -1,4 +1,4 @@
-package maryfisher.austengames.util {
+package maryfisher.util.pathfinding {
 	import maryfisher.austengames.model.data.party.event.PartyPathNodeVO;
 	/**
 	 * ...
