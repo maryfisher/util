@@ -6,8 +6,8 @@ package maryfisher.util.pathfinding {
 	 */
 	public class Graph {
 		
-		public var nodes:Vector.<INode> = Vector.<INode>([null]);
-		public var edges:Vector.<Vector.<Edge>> = Vector.<Vector.<Edge>>([null]);
+		public var nodes:Vector.<INode> = new Vector.<INode>();
+		public var edges:Vector.<Vector.<Edge>> = new Vector.<Vector.<Edge>>();
 		
 		//private var shortestPath:Vector.<Edge>;
 		//private var costToThisNode:Vector.<int>;
