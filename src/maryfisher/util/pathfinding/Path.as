@@ -16,6 +16,8 @@ package maryfisher.util.pathfinding {
 		private var _shortestPath:Vector.<Edge>;
 		private var _priorityQueue:Vector.<WeightedNode>;
 		
+		private var _openQueue:Array;
+		
 		public function Path(graph:Graph) {
 			this.graph = graph;
 			condition = this;
@@ -27,6 +29,57 @@ package maryfisher.util.pathfinding {
 			_heuristicCostToThisNode = new Vector.<int>(l)
 			_shortestPath = new Vector.<Edge>(l);
 			_priorityQueue = new Vector.<WeightedNode>();
+			
+			_openQueue = [];
+		}
+		
+		public function pathFrom(source:int, depth:int = int.MAX_VALUE):Vector.<int> {
+			var l:int = graph.nodes.length;
+			
+			_priorityQueue.length = 0;
+			_priorityQueue.length = l;
+			
+			var depthCounter:int;
+			
+			_priorityQueue[source] = new WeightedNode(source, 0, 0);
+			
+			while (_priorityQueue.length > 0) {
+				
+				var nextNode:WeightedNode = getLowestCostNode();
+				var nextClosestNodeId:int = testNode.index;
+				
+				var nextClosestNode:INode = graph.nodes[nextClosestNodeId];
+				if (depthCounter > depth || (nextClosestNode.isReachable && condition.isTarget(nextClosestNode))) {
+					return buildBetterPath(nextNode, source);
+				}
+				
+				var nextEdges:Vector.<Edge> = graph.edges[nextClosestNodeId];
+				
+				for each(var nextEdge:Edge in nextEdges ) {
+					var toNode:INode = graph.nodes[nextEdge.toNode];
+					if (!toNode.isTraversable && !condition.isTarget(toNode)) {
+						continue;
+					}
+					var testNode:WeightedNode = _priorityQueue[nextEdge.toNode];
+					var costToNode:int = (testNode ? testNode.cost : 0);
+					var newCost:int = costToNode + nextEdge.cost;
+					var heuristicCost:int = heuristic.calculate(toNode, target) + newCost;
+					
+					if (testNode == null) {
+						_priorityQueue.push(new WeightedNode(nextEdge.toNode, newCost, heuristicCost, nextNode));
+					}else if (newCost < costToNode) {
+						
+						testNode.cost = newCost;
+						testNode.heuristicCost = heuristicCost;
+						testNode.parentNode = nextNode;
+						
+					}
+				}
+				
+				depthCounter++;
+			}
+			
+			return null;
 		}
 		
 		/* TODO
@@ -46,12 +99,11 @@ package maryfisher.util.pathfinding {
 			
 			var depthCounter:int;
 			
-			//_priorityQueue.push(new WeightedNode(source, 0, 0));
 			_priorityQueue[source] = (new WeightedNode(source, 0, 0));
 			
 			while (_priorityQueue.length > 0) {
 				
-				var nextClosestNodeId:int = getLowestCostNode();
+				var nextClosestNodeId:int = getLowestCostNode().index;
 				if (_searchFrontier[nextClosestNodeId]) {
 					_shortestPath[nextClosestNodeId] = _searchFrontier[nextClosestNodeId];
 				}else {
@@ -62,7 +114,6 @@ package maryfisher.util.pathfinding {
 				}
 				
 				var nextClosestNode:INode = graph.nodes[nextClosestNodeId];
-				//if (depthCounter > depth || (nextClosestNode.isTraversable && condition.isTarget(nextClosestNode))) {
 				if (depthCounter > depth || (nextClosestNode.isReachable && condition.isTarget(nextClosestNode))) {
 					return buildPath(nextClosestNodeId, source);
 				}
@@ -72,28 +123,20 @@ package maryfisher.util.pathfinding {
 				for each(var nextEdge:Edge in nextEdges ) {
 					var toNode:INode = graph.nodes[nextEdge.toNode];
 					if (!toNode.isTraversable && !condition.isTarget(toNode)) {
-						//trace("not traversable", toNode.index, "from", nextClosestNode, "because node is traversable", toNode.isTraversable);
 						continue;
 					}
 					
 					var newCost:int = _costToThisNode[nextClosestNodeId] + nextEdge.cost;
-					//var heuristicCost:int = heuristic.calculate(toNode, target ? target : graph.nodes[nextClosestNodeId]) + newCost;
 					var heuristicCost:int = heuristic.calculate(toNode, target) + newCost;
 					
 					if (_searchFrontier[nextEdge.toNode] == null) {
 						_costToThisNode[nextEdge.toNode] = newCost;
-						//_heuristicCostToThisNode[nextEdge.toNode] = newCost + heuristicCost;
-						
-						//muss hier die alte Node rausgenommen werden?
-						//_priorityQueue.push(new WeightedNode(nextEdge.toNode, newCost, heuristicCost));
-						//trace("added new priority", nextEdge.toNode);
-						_priorityQueue[nextEdge.toNode] = (new WeightedNode(nextEdge.toNode, newCost, heuristicCost));
+						_priorityQueue[nextEdge.toNode] = new WeightedNode(nextEdge.toNode, newCost, heuristicCost);
 						_searchFrontier[nextEdge.toNode] = nextEdge;
 					}else if (newCost < _costToThisNode[nextEdge.toNode]
 						&& _shortestPath[nextEdge.toNode] == null) {
 						
 						_costToThisNode[nextEdge.toNode] = newCost;
-						//_heuristicCostToThisNode[nextEdge.toNode] = newCost + heuristicCost;
 						_priorityQueue[nextEdge.toNode].cost = newCost;
 						_priorityQueue[nextEdge.toNode].heuristicCost = heuristicCost;
 						_searchFrontier[nextEdge.toNode] = nextEdge;
@@ -177,30 +220,38 @@ package maryfisher.util.pathfinding {
 			//return null;
 		//}
 		
-		private function getLowestCostNode():int {
-			var sn:int;
+		private function getLowestCostNode():WeightedNode {
+			var sn:WeightedNode;
 			var cost:int = 10000000;
-			//var deleteIndex:int = 0;
 			var wn:WeightedNode;
-			//for each(var wn:WeightedNode in _priorityQueue) {
 			var l:int = _priorityQueue.length;
 			for (var i:int = 0; i < l; i++ ) {
 				wn = _priorityQueue[i];
-				//if(wn) trace("weighted nodes", wn);
 				if (wn && wn.heuristicCost < cost) {
 					cost = wn.heuristicCost;
-					sn = wn.index;
-					//deleteIndex = i;
+					sn = wn;
 				}
 			}
-			//if (sn == 0) trace(_priorityQueue);
-			//trace("before splice", priorityQueue);
-			//_priorityQueue.splice(deleteIndex, 1);
-			_priorityQueue[sn] = null;
-			//trace("after splice", priorityQueue)
+			_priorityQueue[sn.index] = null;
 			return sn;
 		}
 		
+		private function buildBetterPath(node:WeightedNode, source:int):Vector.<int> {
+			var finishedPath:Vector.<int> = Vector.<int>([node.index]);
+			trace("to", node.index)
+			var e:WeightedNode = node.parentNode;
+			if (e.index != source) {
+				finishedPath.push(e.index);
+				trace("from", e.index);
+			}
+			while (e = node.parentNode) {
+				if(e.index != source) finishedPath.push(e.index);
+				trace("from", e.index);
+			}
+			return finishedPath;
+		}
+		
+		//private function buildPath(nextClosestNode:int, source:int):Vector.<int> {
 		private function buildPath(nextClosestNode:int, source:int):Vector.<int> {
 			var finishedPath:Vector.<int> = Vector.<int>([nextClosestNode]);
 			trace("to", nextClosestNode)
