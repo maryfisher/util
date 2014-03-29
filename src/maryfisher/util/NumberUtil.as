@@ -3,7 +3,24 @@ package maryfisher.util {
      * NumberUtil provides common functions used with numbers and number formating.
      */
     public class NumberUtil {
-
+		
+		static public function getRandoms(from:int, to:int):Array {
+			var a:Array = [];
+			for (var i:int = from; i <= to ; i++) {
+				a.push(i);
+			}
+			//trace("a", a);
+			var newArray:Array = [];
+			while (a.length > 0) {
+				var rand:int = Math.random() * a.length;
+				//trace("rand", rand, a[rand]);
+				newArray.push(a[rand]);
+				a.splice(a.indexOf(a[rand]), 1);
+			}
+			
+			return newArray;
+		}
+		
     	/**
     	 * Adds a leading zero for numbers smaller than ten.
     	 * @param value Number to add leading zero
