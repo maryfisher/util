@@ -1,5 +1,6 @@
 package maryfisher.util.pathfinding {
 	import adobe.utils.CustomActions;
+	import flash.utils.Dictionary;
 	/**
 	 * ...
 	 * @author mary_fisher
@@ -8,26 +9,55 @@ package maryfisher.util.pathfinding {
 		
 		public var nodes:Vector.<INode> = new Vector.<INode>();
 		public var edges:Vector.<Vector.<Edge>> = new Vector.<Vector.<Edge>>();
+		public var allEdges:Dictionary = new Dictionary();
 		
 		public function Graph() { }
 		
 		public function addNode(node:INode, connections:Array, costs:Array = null):void {
-			node.index = nodes.length;
-			nodes.push(node);
+			//node.index = nodes.length;
+			//nodes.push(node);
+			if (node.index >= nodes.length) {
+				nodes.length = node.index;
+			}
+			nodes[node.index] = node;
+			
 			var toEdges:Vector.<Edge> = new Vector.<Edge>();
+			var index:int;
 			for each(var c:int in connections) {
 				//trace("addNode", node.index, "with connection to", c);// , "and cost:", costs && costs[c])
-				var toEdge:Edge = new Edge(c, node.index, costs ? costs[c] : 1);
-				toEdges.push(toEdge);
+				
+				if(!allEdges[c + "," + node.index]){
+					var toEdge:Edge = new Edge(c, node.index, costs ? costs[index] : 1);
+					toEdges.push(toEdge);
+					allEdges[c + "," + node.index] = toEdge;
+				}
 				//fromEdges
-				var fromEdge:Edge = new Edge(node.index, c, costs ? costs[c] : 1);
+				var fromEdge:Edge
+				if(!allEdges[node.index + "," + c]){
+					fromEdge = new Edge(node.index, c, costs ? costs[index] : 1);
+					allEdges[node.index + "," + c] = fromEdge;
+				}else {
+					fromEdge = null;
+				}
 				if (c >= edges.length) {
 					edges.length = c + 1;
 					edges[c] = new Vector.<Edge>();
 				}
-				edges[c].push(fromEdge);
+				if (!edges[c]) {
+					edges[c] = new Vector.<Edge>();
+				}
+				fromEdge && (edges[c].push(fromEdge));
+				index++;
 			}
-			edges.push(toEdges);
+			if (node.index >= edges.length) {
+				edges.length = node.index + 1;
+			}
+			if (edges[node.index]) {
+				edges[node.index] = edges[node.index].concat(toEdges);
+			}else{
+				edges[node.index] = toEdges;
+			}
+			//edges.push(toEdges);
 		}
 		
 		public function addConnections(node:INode, connections:Array, costs:Array = null):void {

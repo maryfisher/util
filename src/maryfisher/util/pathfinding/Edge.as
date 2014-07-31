@@ -7,9 +7,12 @@ package maryfisher.util.pathfinding {
 		
 		public var fromNode:int;
 		public var toNode:int;
-		public var cost:int = 1;
+		//public var cost:Number = 0;
+		public var cost:Number;
 		
-		public function Edge(to:int, from:int, cost:int = 1) {
+		//public function Edge(to:int, from:int, cost:Number = 0) {
+		public function Edge(to:int, from:int, cost:Number = 1) {
+			this.cost = cost;
 			fromNode = from;
 			toNode = to;
 		}
