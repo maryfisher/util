@@ -151,7 +151,7 @@ package maryfisher.util.pathfinding {
 		
 		/* INTERFACE maryfisher.austengames.util.IHeuristicCost */
 		
-		public function calculate(node1:INode, node2:INode):int {
+		public function calculate(node1:INode, node2:INode):Number {
 			return 0;
 		}
 		

@@ -5,14 +5,12 @@ package maryfisher.view.away3d {
 	import away3d.debug.AwayStats;
 	import away3d.loaders.parsers.Parsers;
 	import flash.display.Stage;
-	import maryfisher.framework.command.view.Model3DCommand;
+	import maryfisher.command.view.away3d.Model3DCommand;
 	import maryfisher.framework.command.view.ViewCommand;
 	import maryfisher.framework.core.IViewController;
 	import maryfisher.framework.core.ViewController;
-	import maryfisher.view.ICameraController;
 	import maryfisher.framework.view.ICameraObject;
 	import maryfisher.framework.view.IViewComponent;
-	import maryfisher.view.BaseView3D;
 	/**
 	 * ...
 	 * @author mary_fisher
