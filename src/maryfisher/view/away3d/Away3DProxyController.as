@@ -2,10 +2,10 @@ package maryfisher.view.away3d {
 	import away3d.core.managers.Stage3DManager;
 	import away3d.core.managers.Stage3DProxy;
 	import away3d.events.Stage3DEvent;
-	import maryfisher.framework.command.view.Model3DCommand;
+	import flash.display.Stage;
+	import maryfisher.command.view.away3d.Model3DCommand;
 	import maryfisher.framework.command.view.ViewCommand;
 	import maryfisher.framework.core.ViewController;
-	import flash.display.Stage;
 	/**
 	 * ...
 	 * @author mary_fisher

@@ -7,9 +7,9 @@ package maryfisher.util.pathfinding {
 	public interface INode {
 		function get index():int;
 		//function set index(value:int):void;
-		function get x():int;
-		function get y():int;
-		function get z():int;
+		function get x():Number;
+		function get y():Number;
+		function get z():Number;
 		function get isReachable():Boolean;
 		function get isTraversable():Boolean;
 	}

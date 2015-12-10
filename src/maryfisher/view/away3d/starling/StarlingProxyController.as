@@ -1,5 +1,7 @@
 package maryfisher.view.away3d.starling {
 	import away3d.core.managers.Stage3DProxy;
+	import maryfisher.view.away3d.IProxyController;
+	import maryfisher.view.starling.BaseStarlingController;
 	import starling.display.Sprite;
 	import maryfisher.framework.core.ViewController;
 	import flash.display.Stage;
@@ -33,6 +35,7 @@ package maryfisher.view.away3d.starling {
 			_stage3DProxy = stage3DProxy;
 			
 			_starling = new Starling(Sprite, _stage, _stage3DProxy.viewPort, _stage3DProxy.stage3D);
+			_starling.start();
 			onContextCreated(null);
 		}
 	}

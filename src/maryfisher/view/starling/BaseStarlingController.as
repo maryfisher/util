@@ -1,6 +1,8 @@
 package maryfisher.view.starling {
 	//import flash.display.Sprite;
 	import flash.display.Stage;
+	import flash.ui.Multitouch;
+	import flash.ui.MultitouchInputMode;
 	import maryfisher.framework.command.view.ViewCommand;
 	import maryfisher.framework.core.IViewController;
 	import maryfisher.framework.core.ViewController;
@@ -11,6 +13,7 @@ package maryfisher.view.starling {
 	import starling.display.DisplayObject;
 	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.events.TouchEvent;
 	/**
 	 * ...
 	 * @author mary_fisher
@@ -59,7 +62,9 @@ package maryfisher.view.starling {
 		}
 		
 		protected function init():void {
-			_starling = new Starling(starling.display.Sprite, _stage);
+			_starling = new Starling(null, _stage);
+			_starling.start();
+			//_starling = new Starling(starling.display.Sprite, _stage);
 			_starling.addEventListener(Event.CONTEXT3D_CREATE, onContextCreated);
 		}
 		
@@ -67,8 +72,6 @@ package maryfisher.view.starling {
 			_starling.stage.addChild(_container);
 			_onFinished.dispatch(_starling);
 			initComps();
-			
-			
 		}
 		
 		public function pauseView():void {

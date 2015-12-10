@@ -1,4 +1,5 @@
 package maryfisher.view.starling {
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import maryfisher.framework.command.view.ViewCommand;
 	import maryfisher.framework.core.ViewController;
@@ -7,7 +8,6 @@ package maryfisher.view.starling {
 	import maryfisher.framework.view.IViewComponent;
 	import starling.display.DisplayObject;
 	import starling.display.Sprite;
-	import flash.display.Sprite;
 	
 	/**
 	 * ...

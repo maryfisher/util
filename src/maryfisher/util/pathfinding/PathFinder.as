@@ -5,11 +5,12 @@ package maryfisher.util.pathfinding {
 	 * ...
 	 * @author mary_fisher
 	 */
-	public class PathFinder implements IHeuristicCost, IGraphTargetCondition{
+	public class PathFinder implements IHeuristicCost, IGraphTargetCondition, IGraphPathCondition{
 		
 		public var target:INode;
 		public var graph:Graph;
-		public var condition:IGraphTargetCondition;
+		public var targetCondition:IGraphTargetCondition;
+		public var pathCondition:IGraphPathCondition;
 		public var heuristic:IHeuristicCost;
 		
 		private var _searchFrontier:Vector.<Edge>;
@@ -24,7 +25,8 @@ package maryfisher.util.pathfinding {
 		
 		public function PathFinder(graph:Graph) {
 			this.graph = graph;
-			condition = this;
+			targetCondition = this;
+			pathCondition = this;
 			heuristic = this;
 			
 			var l:int = graph.nodes.length;
@@ -37,7 +39,7 @@ package maryfisher.util.pathfinding {
 			_openQueue = [];
 		}
 		
-		public function pathFrom(source:int, depth:int = int.MAX_VALUE):Vector.<int> {
+		public function notWorkingPathTo(source:int, depth:int = int.MAX_VALUE):Vector.<int> {
 			var l:int = graph.nodes.length;
 			
 			//_priorityQueue2.length = 0;
@@ -58,7 +60,7 @@ package maryfisher.util.pathfinding {
 				var nextClosestNodeId:int = nextNode.index;
 				
 				var nextClosestNode:INode = graph.nodes[nextClosestNodeId];
-				if (depthCounter > depth || (nextClosestNode.isReachable && condition.isTarget(nextClosestNode))) {
+				if (depthCounter > depth || (nextClosestNode.isReachable && targetCondition.isTarget(nextClosestNode))) {
 					return buildBetterPath(nextNode, source);
 				}
 				
@@ -66,7 +68,7 @@ package maryfisher.util.pathfinding {
 				
 				for each(var nextEdge:Edge in nextEdges ) {
 					var toNode:INode = graph.nodes[nextEdge.toNode];
-					if (!toNode.isTraversable && !condition.isTarget(toNode)) {
+					if (!pathCondition.isTraversable(toNode) || (!toNode.isTraversable && !targetCondition.isTarget(toNode))) {
 						continue;
 					}
 					var testNode:WeightedNode = _priorityQueue[nextEdge.toNode];
@@ -94,7 +96,7 @@ package maryfisher.util.pathfinding {
 			return null;
 		}
 		
-		public function searchFor(source:int, depth:int = int.MAX_VALUE):Vector.<int> {
+		public function pathFrom(source:int, depth:int = int.MAX_VALUE):Vector.<int> {
 			var l:int = graph.nodes.length;
 			_searchFrontier.length = 0;
 			_searchFrontier.length = l;
@@ -119,7 +121,11 @@ package maryfisher.util.pathfinding {
 			//while (_priorityQueue.length > 0) {
 			while (_priorityLength > 0) {
 				//beforeTime = getTimer();
-				var nextClosestNodeId:int = getLowestCostNode().index;
+				var nextClosestWeightedNode:WeightedNode = getLowestCostNode();
+				if (!nextClosestWeightedNode)
+					return new Vector.<int>();
+				
+				var nextClosestNodeId:int = nextClosestWeightedNode.index;
 				//afterTime = getTimer();
 				//trace("getLowestCostNode", afterTime - beforeTime);
 				//trace("nextClosestNodeId", nextClosestNodeId);
@@ -133,7 +139,7 @@ package maryfisher.util.pathfinding {
 				}
 				
 				var nextClosestNode:INode = graph.nodes[nextClosestNodeId];
-				if (depthCounter > depth || (nextClosestNode.isReachable && condition.isTarget(nextClosestNode))) {
+				if (depthCounter > depth || (nextClosestNode.isReachable && targetCondition.isTarget(nextClosestNode))) {
 					return buildPath(nextClosestNodeId, source);
 				}
 				
@@ -142,7 +148,8 @@ package maryfisher.util.pathfinding {
 				for each(var nextEdge:Edge in nextEdges ) {
 					var toNodeId:int = nextEdge.toNode;
 					var toNode:INode = graph.nodes[toNodeId];
-					if (!toNode.isTraversable && !condition.isTarget(toNode)) {
+					//if (!pathCondition.isReachable(nextClosestNode, toNode) && !toNode.isTraversable && !targetCondition.isTarget(toNode)) {
+					if (!pathCondition.isTraversable(toNode) || (!toNode.isTraversable && !targetCondition.isTarget(toNode))) {
 						continue;
 					}
 					
@@ -179,6 +186,12 @@ package maryfisher.util.pathfinding {
 		
 		public function isTarget(node:INode):Boolean {
 			return node.index == target.index;
+		}
+		
+		/* INTERFACE maryfisher.util.pathfinding.IGraphPathCondition */
+		
+		public function isTraversable(node1:INode):Boolean {
+			return true;
 		}
 		
 		//public function search(graph:Graph, source:int, target:int):Vector.<int> {
@@ -256,9 +269,8 @@ package maryfisher.util.pathfinding {
 					sn = wn;
 				}
 			}
-			//trace("delete ", sn.index)
-			delete _priorityQueue[sn.index];
-			//_priorityQueue[sn.index] = null;
+			if(sn)
+				delete _priorityQueue[sn.index];
 			return sn;
 		}
 		
