@@ -149,7 +149,8 @@ package maryfisher.util.pathfinding {
 					var toNodeId:int = nextEdge.toNode;
 					var toNode:INode = graph.nodes[toNodeId];
 					//if (!pathCondition.isReachable(nextClosestNode, toNode) && !toNode.isTraversable && !targetCondition.isTarget(toNode)) {
-					if (!pathCondition.isTraversable(toNode) || (!toNode.isTraversable && !targetCondition.isTarget(toNode))) {
+					if ((!pathCondition.isTraversable(toNode) || !toNode.isTraversable) && !targetCondition.isTarget(toNode)) {
+					//if ((!pathCondition.isTraversable(toNode) && !isTarget) || (!toNode.isTraversable && !isTarget)) {
 						continue;
 					}
 					
